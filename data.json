@@ -1,0 +1,95 @@
+{
+  "luckGrades": ["财富上上签", "暴富特签", "聚财中吉签", "吸金上吉签", "特签"],
+  "actions": [
+    {
+      "name": "今日宜品茗",
+      "text": "一盏清茶，洗去浮尘，让思绪在茶香中缓缓沉淀。",
+      "action": "今日宜品茗！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜联系老友",
+      "text": "岁月如歌，一声问候抵过千言万语，温暖彼此的心房。",
+      "action": "今日宜联系老友！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜整理",
+      "text": "收纳杂物，也梳理心情，让空间与头脑一同回归有序。",
+      "action": "今日宜整理！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜散步",
+      "text": "慢行于街巷或林间，用脚步丈量平凡日子里的微小确幸。",
+      "action": "今日宜散步！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜阅读",
+      "text": "翻开一本书，与智者对话，在字里行间寻得片刻安宁。",
+      "action": "今日宜阅读！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜冥想",
+      "text": "闭目静坐，倾听呼吸的节奏，让纷扰随吐纳渐渐消散。",
+      "action": "今日宜冥想！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜书写",
+      "text": "提笔落下三两心事，把情绪的折痕熨烫成平实的文字。",
+      "action": "今日宜书写！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜烹饪",
+      "text": "洗切炖炒，用一餐饭的温度，喂养身体也疗愈灵魂。",
+      "action": "今日宜烹饪！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜断舍离",
+      "text": "舍弃无用之物，放下执念与负担，轻装迎接新的流动。",
+      "action": "今日宜断舍离！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜早睡",
+      "text": "合上窗帘，对星辰道一声晚安，让睡眠修复疲惫的身心。",
+      "action": "今日宜早睡！",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜关注！",
+      "text": "关注一位社区牛人，从\"长期主义\"中汲取从容力量！",
+      "action": "今日宜关注！",
+      "url": "https://roma.jd.com/content/personal?contentId=jimu_user_info-167626"
+    },
+    {
+      "name": "今日宜阅读",
+      "text": "阅读社区文章，用智慧武装头脑，给理财之道增砖添瓦！",
+      "action": "今日宜阅读",
+      "url": "https://content.jr.jd.com/article/index.html?pageId=731445076"
+    },
+    {
+      "name": "今日宜逛圈",
+      "text": "来社区\"基金圈”逛逛，寻找共鸣伙伴、投资同路人。",
+      "action": "今日宜逛圈",
+      "url": "https://content.jr.jd.com/jrq/?utm_term=copyurl#/topic?id=2738693"
+    },
+    {
+      "name": "今日宜点赞",
+      "text": "每一次市场的起伏都是成长的机会。关注今日行情，为坚持点赞。",
+      "action": "今日宜点赞",
+      "url": "https://content.jr.jd.com/article/index.html?pageId=720330878"
+    },
+    {
+      "name": "今日宜发帖",
+      "text": "分享是快乐的倍增器，将你的投资感悟传递给更多人！",
+      "action": "今日宜发帖",
+      "url": "https://content.jr.jd.com/jrq/?#/group?id=2689640"
+    }
+  ]
+}
