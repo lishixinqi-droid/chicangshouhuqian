@@ -1545,6 +1545,89 @@
       .floating-ctrl:active { transform: scale(0.96); }
       .floating-ctrl-back  { left: 14px; }
       .floating-ctrl-music { right: 14px; }
+
+      /* —— URL 预览模式 (?preview=1): 底部试签工具条 —— */
+      .preview-toolbar {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        z-index: 80;
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 10px 12px 12px;
+        font-family: "JDLangZhengTi", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 12px;
+        color: #2A1A14;
+        background: rgba(255, 253, 245, 0.96);
+        border: 1px solid rgba(225, 37, 27, 0.35);
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px) saturate(125%);
+        -webkit-backdrop-filter: blur(10px) saturate(125%);
+      }
+      .preview-toolbar-title {
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: #B0100C;
+        margin-bottom: 8px;
+        font-size: 12.5px;
+      }
+      .preview-toolbar-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 10px;
+        margin-bottom: 8px;
+      }
+      .preview-toolbar-row label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        color: #5a3010;
+      }
+      .preview-toolbar-row select {
+        max-width: 200px;
+        font-size: 11.5px;
+        padding: 4px 6px;
+        border-radius: 6px;
+        border: 1px solid rgba(180, 139, 46, 0.45);
+        background: #fffdf8;
+      }
+      .preview-toolbar-actions {
+        margin-bottom: 0;
+        justify-content: space-between;
+      }
+      .preview-btn {
+        padding: 5px 10px;
+        font-size: 11.5px;
+        font-weight: 600;
+        border-radius: 8px;
+        border: 1px solid rgba(180, 139, 46, 0.5);
+        background: rgba(255, 250, 235, 0.95);
+        color: #5a3010;
+        cursor: pointer;
+      }
+      .preview-btn:active { transform: scale(0.97); }
+      .preview-btn-primary {
+        border-color: rgba(225, 37, 27, 0.45);
+        background: linear-gradient(180deg, #ffede6 0%, #ffc8b5 100%);
+        color: #7a1a14;
+      }
+      .preview-count {
+        font-variant-numeric: tabular-nums;
+        color: #8c5a12;
+        font-weight: 700;
+        min-width: 4.5em;
+        text-align: center;
+      }
+      .preview-toolbar-note {
+        margin: 8px 0 0;
+        font-size: 10.5px;
+        line-height: 1.45;
+        color: #7a6a58;
+      }
     </style>
   </head>
   <body>
@@ -1584,12 +1667,12 @@
           { "name": "今日宜静心观盘", "intro": "市场情绪起伏，宜静心沉淀", "body": "行情涨跌本是常态，不必为短期波动心神浮躁。静下心稳住持仓心态，静观市场风向起落，从容把握投资节奏。理性持仓，不慌不躁。", "tip": "今日宜静心观盘，查看产品趋势，把握市场趋势与布局机会", "action": "今日宜静心观盘", "linkLabel": "基金榜单", "url": "https://show.jd.com/m/dVAaqEjDlpo3kRyP/?pageKey=dVAaqEjDlpo3kRyP&rankCode=432127726641856&jrlogin=true&jrcontainer=h5&utm_term=copyurl" },
           { "name": "今日宜结识圈内好友", "intro": "财缘需结伴，独行易迷茫", "body": "理财之路，贵在同行相伴。与其独自揣摩行情、暗自纠结持仓，不如邂逅同赛道、同节奏的圈中好友。彼此交流心得、抱团取暖，互相借鉴投资思路，在结伴同行中稳步成长，共赴财富长路。", "tip": "今日宜逛圈结识同路人，聊聊行情、交流持仓心得。", "action": "今日宜结识圈内好友", "linkLabel": "基金圈", "url": "https://content.jr.jd.com/jrq/#/group?id=2689640" },
           { "name": "今日宜整理复盘", "intro": "资产宜梳理，规整方能聚财", "body": "理财贵在时常复盘，适时清点手中持仓、梳理资产配置。优化仓位布局，理清强弱标的，借助数据看清持仓结构，及时微调规划，财富积累方能行稳致远。", "tip": "查看个人持仓，审视资产配置，寻找可优化调整的空间", "action": "今日宜整理复盘", "linkLabel": "基金持仓", "url": "https://roma.jd.com/fund/hold/list/" },
-          { "name": "今日宜调整心态", "intro": "短期行情震荡，宜放宽心境", "body": "市场涨跌本是寻常，不必被短期起伏牵动心绪。放平心态少纠结频繁涨跌，理性看待估值高低，不盲目焦虑、不跟风操作，以从容心境静待行情节奏。", "tip": "放平心态看估值，理性把握布局时机", "action": "今日宜调整心态", "linkLabel": "京小贝", "url": "https://m.jr.jd.com/mjr/search/index.html?keyword=%E4%BA%AC%E5%B0%8F%E8%B4%9D" },
+          { "name": "今日宜调整心态", "intro": "短期行情震荡，宜放宽心境", "body": "市场涨跌本是寻常，不必被短期起伏牵动心绪。放平心态少纠结频繁涨跌，理性看待估值高低，不盲目焦虑、不跟风操作，以从容心境静待行情节奏。", "tip": "放平心态看估值，理性把握布局时机", "action": "今日宜调整心态", "linkLabel": "京小贝", "linkText": "在搜索框内输入\"京小贝\"，一键跳转\"盯基\"功能哦~" },
           { "name": "今日宜精读理财干货", "intro": "财智需沉淀，日积月累自成远见", "body": "理财从无捷径，学识方为底气。深耕理财基础知识，读懂行业赛道逻辑、资产配置门道，让每一次投资决策都有理可依、有据可循。", "tip": "今日宜精读社区干货，悄悄提升理财认知，惊艳所有人", "action": "今日宜精读理财干货", "linkLabel": "文章详情", "url": "https://content.jr.jd.com/article/index.html?pageId=715026569&share_pin=vJpO2zM6ZPoWTrhfA7gbUg==&share_id=Ga+wF9Ds91LhVypDVnIfkQ==&utm_term=copyurl" },
           { "name": "今日宜冷静止躁", "intro": "不被行情易牵动情绪，宜修身稳住本心", "body": "克制追涨冲动，拒绝恐慌割肉，理性胜过一时情绪化操作。保持理性定力，方能从容守好自己的财富节奏，让纷扰随吐纳渐渐消散。", "tip": "平复浮躁心态，稳住持仓节奏，远离冲动交易决策", "action": "今日宜冷静止躁", "linkLabel": "投资专栏", "url": "https://content.jr.jd.com/special/index.html?topicId=2769596" },
           { "name": "今日宜记录持仓日记", "intro": "复盘沉淀财智，总结方能行稳致远", "body": "行情起落皆有踪迹，持仓心得值得珍藏。随手记下当日市场感悟、持仓心境与操作思考，日积月累沉淀专属投资逻辑，在复盘自省中慢慢摸清理财门道。", "tip": "今日宜提笔记录持仓感悟，沉淀思考、分享心得", "action": "今日宜记录持仓日记", "linkLabel": "基金圈", "url": "https://content.jr.jd.com/jrq/#/group?id=2689640" },
           { "name": "今日宜用心烹饪", "intro": "用心打理资产，方能收获稳稳收益", "body": "理财如烹小鲜，耐心调味、火候得当，方能避开震荡“吃面”，稳稳拿下行情“吃肉”。精心打理持仓，守好节奏，让每一份付出都熬出盈利滋味。", "tip": "今日宜用心打理资产，愿持仓常吃肉、远离亏损面", "action": "今日宜用心烹饪", "linkLabel": "基金持仓", "url": "https://roma.jd.com/fund/hold/list/" },
-          { "name": "今日宜断舍离", "intro": "去芜存菁，轻装方能聚财", "body": "理财也要懂得断舍离，果断舍弃长期低迷、拖累收益的鸡肋持仓，放下执念与无效等待，精简仓位、汰弱留强，让资金轻装迎接更好的盈利机会。", "tip": "今日宜理财断舍离，清理弱势持仓，优化资产配置", "action": "今日宜断舍离", "linkLabel": "自选基金", "url": "https://lc.jr.jd.com/toucrowdfund-app/index.html#/optionalfund" },
+          { "name": "今日宜断舍离", "intro": "去芜存菁，轻装方能聚财", "body": "理财也要懂得断舍离，果断舍弃长期低迷、拖累收益的鸡肋持仓，放下执念与无效等待，精简仓位、汰弱留强，让资金轻装迎接更好的盈利机会。", "tip": "今日宜理财断舍离，清理弱势持仓，优化资产配置", "action": "今日宜断舍离", "linkLabel": "自选基金", "linkText": "现在就去基金自选列表看看吧，看下近期有无潜力机会！" },
           { "name": "今日宜作息理性看盘", "intro": "看盘有度作息相宜，理性取舍方得长久", "body": "海外市场虽有夜盘行情，但不必通宵紧绷、过度耗神。张弛有度合理安排看盘时间，不被行情牵着情绪走，保持清醒判断，劳逸结合才是长久理财之道。", "tip": "今日宜理性安排看盘时间，劳逸结合，不盲目熬夜内耗。", "action": "今日宜作息理性看盘", "linkLabel": "全球投资页面", "url": "https://channel.jr.jd.com/pd/global-invest/home/?jrtransparentbar=true&fundUtmSource=262&fundUtmParam=262icon_1516_JJPDicon&utm_term=copyurl" },
           { "name": "今日宜关注达人", "intro": "借达人远见，拓宽自身财路", "body": "独行理财易局限眼界，跟随达人可少走弯路。邂逅社区资深创作者，吸纳长期投资思维，借鉴实操配置心得，以他人经验完善自己的理财布局。", "tip": "今日宜浏览关注优质达人，汲取投资思路，拓宽理财眼界", "action": "今日宜关注达人", "linkLabel": "达人页", "url": "https://roma.jd.com/content/fund-expert?romaFileName=pageCommunityMasterRecommend" },
           { "name": "今日宜阅读精华", "intro": "他山之石，可以攻玉；阅文知势，理财不迷", "body": "细读社区好文，学习守仓定力，不眼红、不追高、不折腾，守好手中筹码更踏实。用真实经验武装思路，让每一次决策更从容。", "tip": "今日宜阅读好文，沉淀投资心态，守住自己的持仓节奏", "action": "今日宜阅读精华", "linkLabel": "基金圈", "url": "https://content.jr.jd.com/jrq/#/group?id=2689640" },
@@ -1604,6 +1687,71 @@
       const makeResult=(data)=>({day:dateTag(),sign:normalizeSign(pickOne(data.luckGrades)),action:pickOne(data.actions)});
       const readSaved=()=>{try{const v=JSON.parse(localStorage.getItem(STORE_KEY)||"null");return v&&v.day===dateTag()?v:null}catch{return null}};
       const writeSaved=(r)=>localStorage.setItem(STORE_KEY,JSON.stringify(r));
+      /** 地址栏 ?preview=1 或 ?preview=true 时启用：不读不写每日缓存、可重复抽签、可手动遍历签×动作 */
+      const isPreviewFromUrl=()=>{
+        try{
+          const p=new URLSearchParams(window.location.search).get("preview");
+          return p==="1"||p==="true"||p==="yes";
+        }catch{return false;}
+      };
+
+      function PreviewToolbar({ data, onApply }){
+        const [si,setSi]=useState(0);
+        const [ai,setAi]=useState(0);
+        const grades=data.luckGrades||[];
+        const actions=data.actions||[];
+        const nSign=grades.length;
+        const nAct=actions.length;
+        const total=Math.max(1,nSign*nAct);
+        const flatIdx=nAct>0?((si*nAct+ai)%total+total)%total:0;
+
+        useEffect(()=>{
+          if(si>=nSign)setSi(Math.max(0,nSign-1));
+          if(ai>=nAct)setAi(Math.max(0,nAct-1));
+        },[nSign,nAct,si,ai]);
+
+        if(!nSign||!nAct)return null;
+
+        const gradeLabel=(g,i)=>{
+          if(typeof g==="string")return g;
+          if(!g)return `签${i+1}`;
+          return g.name||g.title||`签${i+1}`;
+        };
+        const step=(delta)=>{
+          const cur=si*nAct+ai;
+          let n=cur+delta;
+          n=((n%total)+total)%total;
+          setSi(Math.floor(n/nAct));
+          setAi(n%nAct);
+        };
+        const apply=()=>{
+          onApply({day:dateTag(),sign:normalizeSign(grades[si]),action:actions[ai]});
+        };
+
+        return React.createElement("div",{className:"preview-toolbar",role:"region","aria-label":"预览试签"},
+          React.createElement("div",{className:"preview-toolbar-title"},"预览模式 · 无限试签"),
+          React.createElement("div",{className:"preview-toolbar-row"},
+            React.createElement("label",null,"神签",
+              React.createElement("select",{value:String(si),onChange:(e)=>setSi(Number(e.target.value))},
+                grades.map((g,i)=>React.createElement("option",{key:i,value:String(i)},gradeLabel(g,i)))
+              )
+            ),
+            React.createElement("label",null,"动作",
+              React.createElement("select",{value:String(ai),onChange:(e)=>setAi(Number(e.target.value))},
+                actions.map((a,i)=>React.createElement("option",{key:i,value:String(i)},a.name||a.action||`动作${i+1}`))
+              )
+            )
+          ),
+          React.createElement("div",{className:"preview-toolbar-row preview-toolbar-actions"},
+            React.createElement("button",{type:"button",className:"preview-btn",onClick:()=>step(-1)},"上一组"),
+            React.createElement("span",{className:"preview-count"},`${flatIdx+1} / ${total}`),
+            React.createElement("button",{type:"button",className:"preview-btn",onClick:()=>step(1)},"下一组"),
+            React.createElement("button",{type:"button",className:"preview-btn preview-btn-primary",onClick:apply},"应用")
+          ),
+          React.createElement("p",{className:"preview-toolbar-note"},"不写本地「每日一签」缓存；去掉地址栏里的 preview 参数即恢复正式规则。")
+        );
+      }
+
       let sharedAudioCtx = null;
       let masterGainNode = null;
       let bgmStarted = false;
@@ -2164,7 +2312,8 @@
         const [loadingData, setLoadingData] = useState(true);
         const [loadError, setLoadError] = useState("");
         const [showGate, setShowGate] = useState(false);
-        const saved=useMemo(()=>readSaved(),[]);
+        const [previewMode] = useState(() => isPreviewFromUrl());
+        const saved = useMemo(() => (previewMode ? null : readSaved()), [previewMode]);
         const [result,setResult]=useState(saved),[isShaking,setIsShaking]=useState(false),[showStick,setShowStick]=useState(false),[phase,setPhase]=useState(saved?"result":"idle");
         const phaseRef = useRef(phase);
         const gateSoundPlayedRef = useRef(false);
@@ -2321,12 +2470,16 @@
         }, [phase]);
 
         useEffect(() => {
-          try {
-            const gateTag = `${GATE_KEY}:${dateTag()}`;
-            const hasOpened = localStorage.getItem(gateTag) === "1";
-            setShowGate(!hasOpened);
-          } catch {
-            setShowGate(true);
+          if (previewMode) {
+            setShowGate(false);
+          } else {
+            try {
+              const gateTag = `${GATE_KEY}:${dateTag()}`;
+              const hasOpened = localStorage.getItem(gateTag) === "1";
+              setShowGate(!hasOpened);
+            } catch {
+              setShowGate(true);
+            }
           }
 
           const loadData = async () => {
@@ -2335,7 +2488,7 @@
               if (!response.ok) throw new Error("数据加载失败");
               const json = await response.json();
               const gradesOk=Array.isArray(json.luckGrades)&&json.luckGrades.length&&json.luckGrades.every(g=>typeof g==="string"||(g&&typeof g==="object"&&(g.name||g.title)));
-              const actionsOk=Array.isArray(json.actions)&&json.actions.length&&json.actions.every(a=>a&&a.name&&a.url);
+              const actionsOk=Array.isArray(json.actions)&&json.actions.length&&json.actions.every(a=>a&&a.name&&(a.url||((a.linkText||"").trim().length>0)));
               if (!gradesOk || !actionsOk) {
                 throw new Error("数据格式不正确");
               }
@@ -2350,7 +2503,7 @@
           loadData();
         }, []);
 
-        const startDraw=()=>{if(result||isShaking||loadingData||loadError)return;ensureAudioUnlocked().then(()=>startBgm());const drawAudio=drawAudioRef.current;if(drawAudio){drawAudio.currentTime=0;drawAudio.play().catch(()=>{});}setPhase("drawing");setIsShaking(true);setShowStick(false);playShakeSound();setTimeout(()=>setShowStick(true),4200);setTimeout(()=>{if(drawAudioRef.current){drawAudioRef.current.pause();drawAudioRef.current.currentTime=0;}const n=makeResult(data);writeSaved(n);setResult(n);setIsShaking(false);setPhase("result")},5000);};
+        const startDraw=()=>{if((!previewMode&&result)||isShaking||loadingData||loadError)return;ensureAudioUnlocked().then(()=>startBgm());const drawAudio=drawAudioRef.current;if(drawAudio){drawAudio.currentTime=0;drawAudio.play().catch(()=>{});}setPhase("drawing");setIsShaking(true);setShowStick(false);playShakeSound();setTimeout(()=>setShowStick(true),4200);setTimeout(()=>{if(drawAudioRef.current){drawAudioRef.current.pause();drawAudioRef.current.currentTime=0;}const n=makeResult(data);if(!previewMode)writeSaved(n);setResult(n);setIsShaking(false);setPhase("result")},5000);};
         const openAction = () => {
           if (!result || !result.action) return;
           const a = result.action;
@@ -2442,6 +2595,8 @@
         // 结果页: 完全 take over, 不套 .page/.panel
         if (phase === "result" && result) {
           return React.createElement(React.Fragment, null,
+            previewMode && !loadingData && data.luckGrades.length > 0 && data.actions.length > 0 &&
+              React.createElement(PreviewToolbar, { data, onApply: (r) => { setResult(r); setPhase("result"); } }),
             React.createElement(AnimatePresence, null,
               showGate && React.createElement(motion.div,
                 { key:"gate", initial:{opacity:1}, animate:{opacity:1}, exit:{opacity:0}, transition:{duration:0.35} },
@@ -2449,6 +2604,7 @@
               )
             ),
             React.createElement(ResultView, {
+              key: ((result.sign && (result.sign.name || "")) + "|" + (result.action && (result.action.name || result.action.action || ""))),
               result,
               onCta: openAction,
               onBack: backToTube,
@@ -2464,6 +2620,8 @@
 
         // idle / drawing 阶段: 沿用原 panel + tube, 同款 ambient-frame 氛围层
         return React.createElement(React.Fragment,null,
+          previewMode && !loadingData && data.luckGrades.length > 0 && data.actions.length > 0 &&
+            React.createElement(PreviewToolbar, { data, onApply: (r) => { setResult(r); setPhase("result"); } }),
           React.createElement(AnimatePresence,null,
             showGate && React.createElement(motion.div,{key:"gate",initial:{opacity:1},animate:{opacity:1},exit:{opacity:0},transition:{duration:0.35}},React.createElement(OpeningGates,{onDone:onGateDone}))
           ),
@@ -2491,7 +2649,7 @@
                 )
               ),
               React.createElement("button",{className:"music-btn",onClick:toggleMusic,disabled:showGate},musicOn?"关闭音乐":"开启音乐"),
-              React.createElement("p",{className:"tip"},loadError?`签库错误：${loadError}`:"同一设备每日仅可抽签一次")
+              React.createElement("p",{className:"tip"},loadError?`签库错误：${loadError}`:(previewMode?"预览模式：可重复摇签，不写每日缓存；底部可选签+动作后点「应用」。":"同一设备每日仅可抽签一次"))
             )
           ),
           React.createElement(AnimatePresence, null,

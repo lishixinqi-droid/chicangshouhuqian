@@ -40,7 +40,7 @@
       "tip": "放平心态看估值，理性把握布局时机",
       "action": "今日宜调整心态",
       "linkLabel": "京小贝",
-      "url": "https://m.jr.jd.com/mjr/search/index.html?keyword=%E4%BA%AC%E5%B0%8F%E8%B4%9D"
+      "linkText": "在搜索框内输入\"京小贝\"，一键跳转\"盯基\"功能哦~"
     },
     {
       "name": "今日宜精读理财干货",
@@ -85,7 +85,7 @@
       "tip": "今日宜理财断舍离，清理弱势持仓，优化资产配置",
       "action": "今日宜断舍离",
       "linkLabel": "自选基金",
-      "url": "https://roma.jd.com/fund/optional/list/"
+      "linkText": "现在就去基金自选列表看看吧，看下近期有无潜力机会！"
     },
     {
       "name": "今日宜作息理性看盘",
