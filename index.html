@@ -147,6 +147,36 @@
         letter-spacing: 0.08em;
       }
 
+      .drawing-hint {
+        margin: -6px 0 14px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+      .drawing-hint .loading-fortune {
+        margin: 0 0 10px;
+        line-height: 1.55;
+      }
+      .draw-countdown-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 52px;
+        min-height: 52px;
+        padding: 0 14px;
+        border-radius: 14px;
+        font-family: "JDLangZhengTi", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #E1251B;
+        background: linear-gradient(180deg, rgba(255, 250, 235, 0.95) 0%, rgba(255, 236, 200, 0.88) 100%);
+        border: 1px solid rgba(212, 175, 55, 0.65);
+        box-shadow:
+          0 4px 14px rgba(178, 34, 34, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.75);
+      }
+
       .tube-wrap { height: 310px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; }
 
       .tube-aura {
@@ -2314,7 +2344,7 @@
         const [showGate, setShowGate] = useState(false);
         const [previewMode] = useState(() => isPreviewFromUrl());
         const saved = useMemo(() => (previewMode ? null : readSaved()), [previewMode]);
-        const [result,setResult]=useState(saved),[isShaking,setIsShaking]=useState(false),[showStick,setShowStick]=useState(false),[phase,setPhase]=useState(saved?"result":"idle");
+        const [result,setResult]=useState(saved),[isShaking,setIsShaking]=useState(false),[showStick,setShowStick]=useState(false),[phase,setPhase]=useState(saved?"result":"idle"),[drawCountdown,setDrawCountdown]=useState(null);
         const phaseRef = useRef(phase);
         const gateSoundPlayedRef = useRef(false);
         const gateAudioRef = useRef(null);
@@ -2470,6 +2500,22 @@
         }, [phase]);
 
         useEffect(() => {
+          if (phase !== "drawing") {
+            setDrawCountdown(null);
+            return;
+          }
+          setDrawCountdown(5);
+          let elapsed = 0;
+          const id = setInterval(() => {
+            elapsed += 1;
+            const next = 5 - elapsed;
+            setDrawCountdown(next > 0 ? next : null);
+            if (elapsed >= 5) clearInterval(id);
+          }, 1000);
+          return () => clearInterval(id);
+        }, [phase]);
+
+        useEffect(() => {
           if (previewMode) {
             setShowGate(false);
           } else {
@@ -2503,7 +2549,7 @@
           loadData();
         }, []);
 
-        const startDraw=()=>{if((!previewMode&&result)||isShaking||loadingData||loadError)return;ensureAudioUnlocked().then(()=>startBgm());const drawAudio=drawAudioRef.current;if(drawAudio){drawAudio.currentTime=0;drawAudio.play().catch(()=>{});}setPhase("drawing");setIsShaking(true);setShowStick(false);playShakeSound();setTimeout(()=>setShowStick(true),4200);setTimeout(()=>{if(drawAudioRef.current){drawAudioRef.current.pause();drawAudioRef.current.currentTime=0;}const n=makeResult(data);if(!previewMode)writeSaved(n);setResult(n);setIsShaking(false);setPhase("result")},5000);};
+        const startDraw=()=>{if((!previewMode&&result)||isShaking||loadingData||loadError)return;ensureAudioUnlocked().then(()=>startBgm());const drawAudio=drawAudioRef.current;if(drawAudio){drawAudio.currentTime=0;drawAudio.play().catch(()=>{});}setPhase("drawing");setDrawCountdown(5);setIsShaking(true);setShowStick(false);playShakeSound();setTimeout(()=>setShowStick(true),4200);setTimeout(()=>{if(drawAudioRef.current){drawAudioRef.current.pause();drawAudioRef.current.currentTime=0;}const n=makeResult(data);if(!previewMode)writeSaved(n);setResult(n);setIsShaking(false);setPhase("result")},5000);};
         const openAction = () => {
           if (!result || !result.action) return;
           const a = result.action;
@@ -2635,7 +2681,10 @@
                 React.createElement("span",{className:"deco-rule"})
               ),
               React.createElement("p",{className:"subtitle"},"每日一签，守护财富"),
-              phase==="drawing" && React.createElement("p",{className:"loading-fortune"},"正在生成今日运势……"),
+              phase==="drawing" && React.createElement("div",{className:"drawing-hint"},
+                React.createElement("p",{className:"loading-fortune"},"正在为您请签……心诚则灵，请深呼吸"),
+                drawCountdown != null && drawCountdown > 0 && React.createElement("div",{className:"draw-countdown-num","aria-live":"polite"},String(drawCountdown))
+              ),
               React.createElement(Tube,{isShaking,showStick}),
               React.createElement("div",{style:{marginTop:16,position:"relative",zIndex:1}},
                 React.createElement(
