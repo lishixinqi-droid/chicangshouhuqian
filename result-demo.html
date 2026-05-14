@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>持仓守护签 · 手账便签 Demo</title>
+
+    <!-- Tailwind play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              jdred:    "#E1251B",
+              cinnabar: "#A52A2A",
+              bronze:   "#B48B2E",
+              amber1:   "#FBC53D",
+              amber2:   "#F4A82E",
+              paper:    "#FFFDF9",   /* 主背景：纯净浅米色 */
+              graybrown:"#8A7A6A",   /* 文案灰棕 */
+              ink:      "#2A2018",
+            },
+            fontFamily: {
+              jd:     ['"JDLangZhengTi"', '"PingFang SC"', '"Microsoft YaHei"', 'sans-serif'],
+              kai:    ['"STKaiti"', '"KaiTi"', '"FangSong"', 'serif'],
+            },
+            keyframes: {
+              /* 纸张从上飘落 + 极小角度回正 */
+              paperFall: {
+                "0%":   { opacity: 0, transform: "translateY(-26px) rotate(-1.5deg) scale(0.98)" },
+                "60%":  { opacity: 1, transform: "translateY(4px)   rotate(0.6deg)  scale(1.005)" },
+                "100%": { opacity: 1, transform: "translateY(0)     rotate(-0.4deg) scale(1)" },
+              },
+              /* 木签自顶向下舒展 */
+              slipDown: {
+                "0%":   { opacity: 0, transform: "translateY(-18px) scaleY(0.85)" },
+                "100%": { opacity: 1, transform: "translateY(0)     scaleY(1)" },
+              },
+              /* CTA: 每 3s 一次 Shimmer 扫光 */
+              ctaShimmer: {
+                "0%":   { transform: "translateX(-150%) skewX(-18deg)", opacity: 0 },
+                "8%":   { opacity: 0.85 },
+                "20%":  { transform: "translateX(250%)  skewX(-18deg)", opacity: 0.85 },
+                "26%":  { opacity: 0 },
+                "100%": { transform: "translateX(250%)  skewX(-18deg)", opacity: 0 },
+              },
+              /* 毛笔圈极轻微的呼吸 */
+              circleBreath: {
+                "0%,100%": { transform: "scale(1) rotate(-0.5deg)" },
+                "50%":     { transform: "scale(1.012) rotate(0.5deg)" },
+              },
+            },
+            animation: {
+              paperFall:    "paperFall 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
+              slipDown:     "slipDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) both",
+              ctaShimmer:   "ctaShimmer 3s linear infinite",
+              circleBreath: "circleBreath 5s ease-in-out infinite",
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- 京东朗正体 + 中文衬线 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* === 京东朗正体（官方 CDN） === */
+      @font-face {
+        font-family: "JDLangZhengTi";
+        src: url("https://jdrdl.jd.com/assets/fonts/JDLANGZHENGTI-R--GBK1-0.woff2") format("woff2");
+        font-weight: 400;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "JDLangZhengTi";
+        src: url("https://jdrdl.jd.com/assets/fonts/JDLANGZHENGTI-B--GBK1-0.woff2") format("woff2");
+        font-weight: 700;
+        font-display: swap;
+      }
+
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: "Noto Serif SC", "Songti SC", "STKaiti", "KaiTi", serif;
+        /* 整页 = 牛皮纸 (Warm Kraft Paper) + 极淡交叉纤维纹 */
+        background-color: #F4EBD0;
+        background-image:
+          /* 垂直纤维 */
+          repeating-linear-gradient(0deg,
+            rgba(140, 100, 50, 0.05) 0px,
+            rgba(140, 100, 50, 0.05) 1px,
+            transparent 1px,
+            transparent 4px),
+          /* 水平纤维 */
+          repeating-linear-gradient(90deg,
+            rgba(140, 100, 50, 0.035) 0px,
+            rgba(140, 100, 50, 0.035) 1px,
+            transparent 1px,
+            transparent 4px),
+          /* 中心微微暖光, 视觉聚焦 */
+          radial-gradient(ellipse at 50% 30%, rgba(255, 240, 200, 0.45) 0%, transparent 60%);
+        background-attachment: fixed;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* ========================================
+       * 撕页便签：zigzag 锯齿边 + drop-shadow 轻投影
+       * 用 clip-path 切顶/底边为微小波折
+       * ======================================== */
+      .paper-note {
+        --tear: 5px;
+        clip-path: polygon(
+          /* TOP edge: small zigzag */
+          0% var(--tear), 4% 0%, 8% var(--tear), 12% 0%, 16% var(--tear), 20% 0%, 24% var(--tear), 28% 0%, 32% var(--tear), 36% 0%, 40% var(--tear), 44% 0%, 48% var(--tear), 52% 0%, 56% var(--tear), 60% 0%, 64% var(--tear), 68% 0%, 72% var(--tear), 76% 0%, 80% var(--tear), 84% 0%, 88% var(--tear), 92% 0%, 96% var(--tear), 100% 0%,
+          /* RIGHT */
+          100% calc(100% - var(--tear)),
+          /* BOTTOM edge: small zigzag (reversed) */
+          96% 100%, 92% calc(100% - var(--tear)), 88% 100%, 84% calc(100% - var(--tear)), 80% 100%, 76% calc(100% - var(--tear)), 72% 100%, 68% calc(100% - var(--tear)), 64% 100%, 60% calc(100% - var(--tear)), 56% 100%, 52% calc(100% - var(--tear)), 48% 100%, 44% calc(100% - var(--tear)), 40% 100%, 36% calc(100% - var(--tear)), 32% 100%, 28% calc(100% - var(--tear)), 24% 100%, 20% calc(100% - var(--tear)), 16% 100%, 12% calc(100% - var(--tear)), 8% 100%, 4% calc(100% - var(--tear)),
+          /* LEFT */
+          0% 100%
+        );
+      }
+      /* drop-shadow follows the torn shape, 在牛皮纸上更明显的浮起感 */
+      .paper-note-wrap {
+        filter: drop-shadow(0 6px 16px rgba(70, 45, 20, 0.20))
+                drop-shadow(0 2px 5px rgba(70, 45, 20, 0.14))
+                drop-shadow(0 0 1px rgba(70, 45, 20, 0.10));
+      }
+      /* 便签内底色: 与神签卡完全一致 — 暖米白 (cream white) + 宣纸纹 + 金色微晕 */
+      .paper-note {
+        background-color: rgba(255, 250, 235, 0.85) !important;
+        background-image:
+          /* 宣纸横纹（极淡金调） */
+          repeating-linear-gradient(180deg,
+            rgba(180, 139, 46, 0.04) 0px,
+            rgba(180, 139, 46, 0.04) 1px,
+            transparent 1px,
+            transparent 6px),
+          /* 金色径向晕光 */
+          radial-gradient(ellipse at center, rgba(255, 232, 180, 0.32) 0%, transparent 75%) !important;
+        backdrop-filter: blur(8px) saturate(120%);
+        -webkit-backdrop-filter: blur(8px) saturate(120%);
+      }
+
+      /* ========================================
+       * 动作便签 · 信息结构化样式
+       * 标题: 中黑体 / 正文: Serif 常规
+       * ======================================== */
+      .section-label {
+        display: inline-block;
+        font-family: "PingFang SC", "Microsoft YaHei", "Heiti SC", sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.10em;
+        color: #5B3A28;
+        margin-bottom: 5px;
+      }
+      @media (min-width: 640px) {
+        .section-label { font-size: 14px; }
+      }
+      /* 三段正文统一: 同一 Serif 字体 + 同一字号 + 同一行高 (整体放大) */
+      .section-content {
+        font-family: "Noto Serif SC", "Songti SC", "STSong", serif;
+        color: #4A342E;
+        font-size: 15.5px;
+        line-height: 1.9;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+      }
+      @media (min-width: 640px) {
+        .section-content {
+          font-size: 17.5px;
+          line-height: 1.95;
+        }
+      }
+
+      /* ========================================
+       * 神签 Hero · 暖米白 (cream white) + 宣纸纹 + 金色微晕
+       * 偏米色调, 避开"半透明白透出灰底"的脏感
+       * ======================================== */
+      .wooden-slip {
+        background-color: rgba(255, 250, 235, 0.85);
+        background-image:
+          /* 宣纸横纹（极淡金调） */
+          repeating-linear-gradient(180deg,
+            rgba(180, 139, 46, 0.04) 0px,
+            rgba(180, 139, 46, 0.04) 1px,
+            transparent 1px,
+            transparent 6px),
+          /* 金色径向晕光 */
+          radial-gradient(ellipse at center, rgba(255, 232, 180, 0.32) 0%, transparent 75%);
+        backdrop-filter: blur(8px) saturate(120%);
+        -webkit-backdrop-filter: blur(8px) saturate(120%);
+      }
+
+      /* —— 印章 · 旋转钢印感 (用于姓名末尾三字) —— */
+      .spirit-seal {
+        display: inline-block;
+        padding: 2px 7px 3px;
+        margin-left: 5px;
+        font-family: "KaiTi", "STKaiti", "FangSong", "Songti SC", serif;
+        font-weight: 700;
+        color: #C7150E;
+        letter-spacing: 0.08em;
+        background-color: rgba(225, 37, 27, 0.15);
+        border: 1px dashed rgba(225, 37, 27, 0.60);
+        border-radius: 3px;
+        transform: rotate(-4deg);
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+        vertical-align: 1px;
+      }
+
+      /* —— 古铜色 L 型护角 (4 角) —— */
+      .corner-bronze {
+        position: absolute;
+        width: 13px;
+        height: 13px;
+        border: 1.5px solid #B48B2E;
+        pointer-events: none;
+      }
+      .corner-tl { top: 5px;    left: 5px;   border-right: none; border-bottom: none; }
+      .corner-tr { top: 5px;    right: 5px;  border-left:  none; border-bottom: none; }
+      .corner-bl { bottom: 5px; left: 5px;   border-right: none; border-top:    none; }
+      .corner-br { bottom: 5px; right: 5px;  border-left:  none; border-top:    none; }
+
+      /* —— 标签小字（抽签结果： / 签文内容：） —— */
+      .hero-label {
+        display: inline-block;
+        font-family: "Noto Serif SC", "Songti SC", serif;
+        font-size: 12px;
+        letter-spacing: 0.24em;
+        color: rgba(92, 26, 20, 0.65);
+        font-weight: 500;
+      }
+      @media (min-width: 640px) {
+        .hero-label { font-size: 13px; }
+      }
+
+      /* 按钮 · 红色玻璃拟态（略强一档以保 CTA 主次） */
+      .glass-btn {
+        background-color: rgba(225, 37, 27, 0.12);
+        backdrop-filter: blur(12px) saturate(150%);
+        -webkit-backdrop-filter: blur(12px) saturate(150%);
+      }
+
+      /* ========================================
+       * 文字马克笔下划线 (黄色高亮)
+       * 用 background 模拟马克笔涂抹
+       * ======================================== */
+      .marker {
+        background-image: linear-gradient(120deg,
+          rgba(251, 197, 61, 0.45) 0%,
+          rgba(251, 197, 61, 0.6) 50%,
+          rgba(251, 197, 61, 0.45) 100%);
+        background-repeat: no-repeat;
+        background-size: 100% 0.5em;
+        background-position: 0 88%;
+        padding: 0 2px;
+      }
+
+      /* ========================================
+       * 顶部小标题装饰线（红调，金底上更清晰）
+       * ======================================== */
+      .deco-rule {
+        display: inline-block;
+        height: 1px;
+        width: 24px;
+        background: linear-gradient(90deg, transparent, rgba(225, 37, 27, 0.45), transparent);
+        vertical-align: middle;
+        margin: 0 8px 4px;
+      }
+
+      /* ========================================
+       * 隐藏的微妙：印章贴纸卷边
+       * ======================================== */
+      .stamp-tilt-1 { transform: rotate(7deg); }
+      .stamp-tilt-2 { transform: rotate(-4deg); }
+    </style>
+  </head>
+
+  <body class="min-h-[100dvh] text-ink overflow-x-hidden">
+    <main class="relative mx-auto flex min-h-[100dvh] w-full max-w-md flex-col
+                 px-5 py-5 gap-4
+                 sm:px-6 sm:py-12 sm:gap-7
+                 justify-start sm:justify-center">
+
+      <!-- ─────────── 顶部小标题（仅保留主标） ─────────── -->
+      <header class="text-center select-none animate-paperFall" style="animation-delay:0s;">
+        <h1 class="font-jd text-[20px] sm:text-[24px] font-bold tracking-[0.18em] text-jdred antialiased">
+          <span class="deco-rule"></span>
+          持仓守护签
+          <span class="deco-rule"></span>
+        </h1>
+      </header>
+
+      <!-- ─────────── 神签 Hero · 玻璃宣纸卡 + 印章 + 铜角 ─────────── -->
+      <section class="animate-slipDown" style="animation-delay:0.1s; transform-origin: top center;">
+        <div class="wooden-slip relative mx-auto rounded-xl px-6 py-4 sm:px-8 sm:py-5 text-center"
+             style="width: 92%;
+                    border: 1px solid rgba(225, 37, 27, 0.32);
+                    box-shadow: inset 0 0 0 4px transparent,
+                                inset 0 0 0 5px rgba(180, 139, 46, 0.22),
+                                0 2px 8px rgba(225, 37, 27, 0.10);">
+
+          <!-- 四角古铜 L 型护角 -->
+          <span class="corner-bronze corner-tl"></span>
+          <span class="corner-bronze corner-tr"></span>
+          <span class="corner-bronze corner-bl"></span>
+          <span class="corner-bronze corner-br"></span>
+
+          <!-- ① 抽签结果： -->
+          <div class="mt-1">
+            <span class="hero-label">抽签结果：</span>
+          </div>
+
+          <!-- ② 主签名 + 末尾三字印章 (slice(-3) 动态分割) -->
+          <div class="mt-1.5 sm:mt-2 leading-[1.5]" data-spirit-name="吸金·纳福生金上吉签">
+            <h2 class="font-jd inline text-[20px] sm:text-[24px] font-bold tracking-[0.04em] text-[#2A1A14] antialiased">
+              <span data-spirit-main></span><!-- JS 注入主体 -->
+              <span class="spirit-seal" data-spirit-seal></span><!-- JS 注入末尾三字 -->
+            </h2>
+          </div>
+
+          <!-- 分隔细线（金红渐隐） -->
+          <div class="my-2.5 sm:my-3 mx-auto h-px w-2/3"
+               style="background: linear-gradient(90deg, transparent, rgba(225, 37, 27, 0.35), rgba(180, 139, 46, 0.35), transparent);"></div>
+
+          <!-- ③ 签文内容： -->
+          <div>
+            <span class="hero-label">签文内容：</span>
+          </div>
+
+          <!-- ④ 签文正文 -->
+          <p class="mt-1 sm:mt-1.5 font-jd text-[14.5px] sm:text-[16.5px] font-medium tracking-[0.28em] text-[#7A1A14] antialiased pr-[-0.28em]">
+            聚利日日安，金运自绵长
+          </p>
+        </div>
+      </section>
+
+      <!-- ─────────── 今日宜 · 撕页便签 (结构化手账) ─────────── -->
+      <section class="paper-note-wrap animate-paperFall" style="animation-delay:0.3s;">
+        <div class="paper-note relative px-5 pt-7 pb-5 sm:px-8 sm:pt-9 sm:pb-7">
+
+          <!-- 红色「吉」小印章 (缩小, 贴角, 不挡字) -->
+          <div class="absolute -top-1.5 right-1.5 sm:right-2 stamp-tilt-1 z-20">
+            <div class="relative grid place-items-center w-7 h-7 sm:w-8 sm:h-8 rounded-[4px] bg-jdred text-amber1 shadow-sm"
+                 style="font-family: KaiTi, STKaiti, serif; font-size: 13px; font-weight: 700;">
+              <span class="absolute inset-[2.5px] border border-amber1/60 rounded-[2.5px] pointer-events-none"></span>
+              <span class="relative leading-none">吉</span>
+            </div>
+          </div>
+
+          <!-- [顶部·核心标签] 手绘毛笔圈 + 今日宜·XX (action.name) -->
+          <div class="flex justify-center mb-4 sm:mb-5">
+            <div class="relative inline-block animate-circleBreath" style="transform-origin: center;">
+              <svg class="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 240 56" preserveAspectRatio="none">
+                <path d="M 18 28 C 16 12, 64 6, 122 6 C 188 7, 224 14, 226 28 C 228 44, 180 50, 120 51 C 56 51, 14 47, 18 28 Z"
+                      fill="none" stroke="#E1251B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"
+                      opacity="0.9" style="filter: drop-shadow(0 0 0.4px rgba(225,37,27,0.7));"/>
+                <path d="M 224 26 C 226 24, 228 27, 226 30"
+                      fill="none" stroke="#E1251B" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+              </svg>
+              <span class="font-jd relative px-7 py-2 sm:px-8 sm:py-2.5 inline-block text-[15.5px] sm:text-[17px] font-bold tracking-[0.06em] text-ink antialiased whitespace-nowrap">
+                今日宜 · 作息理性看盘
+              </span>
+            </div>
+          </div>
+
+          <!-- [第一层] 运势引言 · intro -->
+          <div class="text-left mb-2.5 sm:mb-3 px-0.5">
+            <h3 class="section-label">【运势引言】</h3>
+            <p class="section-content">
+              看盘有度作息相宜，理性取舍方得长久
+            </p>
+          </div>
+
+          <!-- [第二层] 文案内容 · body -->
+          <div class="text-left mb-2.5 sm:mb-3 px-0.5">
+            <h3 class="section-label">【文案内容】</h3>
+            <p class="section-content">
+              海外市场虽有夜盘行情，但不必通宵紧绷、过度耗神。张弛有度合理安排看盘时间，不被行情牵着情绪走，保持清醒判断，劳逸结合才是长久理财之道。
+            </p>
+          </div>
+
+          <!-- [第三层] 建议操作 · tip  (保留黄色马克笔, 同字体同字号, 仅加粗以呼应行动号召) -->
+          <div class="text-left px-0.5">
+            <h3 class="section-label">【建议操作】</h3>
+            <p class="section-content font-bold">
+              今日宜<span class="marker">理性安排看盘时间，劳逸结合，不盲目熬夜内耗</span>。
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ─────────── CTA · 胶囊金按钮 (饱满、亮、轻盈) ─────────── -->
+      <section class="animate-paperFall" style="animation-delay:0.5s;">
+        <button
+          type="button"
+          class="glass-btn group relative w-full overflow-hidden rounded-full py-2.5 sm:py-3 px-6
+                 font-bold tracking-[0.18em] text-[13.5px] sm:text-[15px] text-[#7A1A14] antialiased
+                 transition-all duration-150 active:scale-[0.98]"
+          style="border: 1px solid rgba(225, 37, 27, 0.30);
+                 box-shadow: 0 4px 14px -4px rgba(225, 37, 27, 0.22),
+                             inset 0 1px 0 rgba(255, 255, 255, 0.55);"
+        >
+          <!-- 顶部高光 -->
+          <span class="pointer-events-none absolute top-0 left-4 right-4 h-1/2 rounded-t-full opacity-55"
+                style="background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0));"></span>
+
+          <!-- 3秒扫光 -->
+          <span class="pointer-events-none absolute inset-y-0 -inset-x-1 overflow-hidden">
+            <span class="absolute top-0 bottom-0 w-1/3 animate-ctaShimmer"
+                  style="background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.85) 50%, transparent 100%); filter: blur(0.5px);"></span>
+          </span>
+
+          <!--
+            按钮文案 · 动态映射规则:
+              text = "去看 " + action.linkLabel
+              ▸ action #1  → 去看基金榜单
+              ▸ action #2  → 去看基金圈首页
+              ▸ action #3  → 去看基金持仓页
+              ▸ action #10 → 去看全球投资页面     ← 当前 demo
+              ▸ ...
+              ▸ 文本类 (linkText 而非 url) 的可以用 "查看详情" 兜底
+            React 集成时: btnLabel = '去看' + (a.url ? a.linkLabel : '详情')
+          -->
+          <span class="relative inline-flex items-center justify-center gap-1">
+            <span data-cta-label>去看全球投资页面</span>
+            <span class="text-[#9A2222] tracking-tight">&gt;&gt;</span>
+          </span>
+        </button>
+
+        <p class="mt-2 sm:mt-4 text-center text-[11.5px] sm:text-[13px] tracking-[0.22em] text-[#7A4030]/80 font-medium">
+          明日再来 · 记录你的财富心情
+        </p>
+      </section>
+
+      <!-- ─────────── Demo 说明（仅大屏可见, 避免移动端占首屏） ─────────── -->
+      <section class="mt-2 select-none hidden sm:block">
+        <details class="rounded-2xl border border-bronze/25 bg-white/70 backdrop-blur-md px-4 py-3 text-[12.5px] text-graybrown">
+          <summary class="cursor-pointer font-bold tracking-wider text-jdred">Demo 样式规范 (点击展开)</summary>
+          <ul class="mt-2 space-y-1.5 leading-relaxed">
+            <li>· 色彩比例：<b class="text-graybrown">70% 留白</b> · <b class="text-jdred">20% 红色点缀</b> · <b class="text-bronze">10% 金色强调</b></li>
+            <li>· 背景：纯净浅米 <code class="text-jdred">#FFFDF9</code>，无任何底纹</li>
+            <li>· 神签：轻盈木签，浅金渐变 + 极淡横向木纹 + 顶底金色装饰线；签文 <code>tracking-[0.28em]</code> 制造疏朗感</li>
+            <li>· 动作便签：<code class="text-jdred">clip-path</code> zigzag 锯齿边 + <code>drop-shadow</code> 轻投影；右上角微斜红色「吉」字印章贴纸</li>
+            <li>· 今日宜：SVG 手绘毛笔圈（带笔尾收锋）轻微呼吸；圈内字号 15 朗正体</li>
+            <li>· 核心建议：<b>黄色马克笔涂抹</b> + 手绘金色波浪下划线 (SVG 多段二次贝塞尔)</li>
+            <li>· 长文案：12.5px 灰棕 <code>#8A7A6A</code> + <code>leading-[2]</code> 大行距</li>
+            <li>· CTA：胶囊形态，<code>#FFE17C → #FBC53D → #F4A82E</code> 锡珀金，<code>shadow-sm</code> 级轻投影 + 每 3s 扫光</li>
+            <li>· 动效：<code class="text-jdred">paperFall</code> 纸张飘落（带极小角度回正） · 神签 <code>slipDown</code> 自顶展开</li>
+          </ul>
+        </details>
+      </section>
+
+    </main>
+
+    <!-- ============================================================
+     · 动态印章: 任何 [data-spirit-name] 容器, 自动 slice(-3)
+     ============================================================ -->
+    <script>
+      (function () {
+        function applySeal() {
+          document.querySelectorAll("[data-spirit-name]").forEach((el) => {
+            const full = (el.dataset.spiritName || "").trim();
+            if (!full) return;
+            const seal = full.slice(-3);
+            const main = full.slice(0, -3);
+            const mainEl = el.querySelector("[data-spirit-main]");
+            const sealEl = el.querySelector("[data-spirit-seal]");
+            if (mainEl) mainEl.textContent = main;
+            if (sealEl) sealEl.textContent = seal;
+          });
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", applySeal);
+        } else {
+          applySeal();
+        }
+      })();
+    </script>
+
+    <!-- ============================================================
+     · 自动缩放: 字体已整体放大, 在小屏 (<640px) 上若内容超过视口高度,
+     · 自动以 transform: scale() 等比缩小 main, 保证整页一屏可见、不滚动
+     · 只对手机生效, 桌面保持原始大小
+     ============================================================ -->
+    <script>
+      (function () {
+        let ticking = false;
+        function fitMobile() {
+          const main = document.querySelector("main");
+          if (!main) return;
+
+          /* reset */
+          main.style.transform = "none";
+          main.style.transformOrigin = "top center";
+          document.body.style.height = "";
+
+          /* 仅在小屏生效 */
+          if (window.innerWidth >= 640) return;
+
+          requestAnimationFrame(() => {
+            const natural = main.getBoundingClientRect().height;
+            const vh = window.innerHeight;
+
+            if (natural > vh) {
+              /* 等比缩放 (最小 0.75), 顶部加 4px 透气 */
+              const scale = Math.max(0.75, (vh - 4) / natural);
+              main.style.transformOrigin = "top center";
+              main.style.transform = `scale(${scale})`;
+              document.body.style.height = `${natural * scale}px`;
+              document.body.style.overflow = "hidden";
+            } else {
+              document.body.style.overflow = "";
+            }
+          });
+        }
+        function schedule() {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(() => { fitMobile(); ticking = false; });
+        }
+        window.addEventListener("load", schedule);
+        window.addEventListener("resize", schedule);
+        window.addEventListener("orientationchange", schedule);
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(schedule);
+        }
+        /* 兜底: 200ms 后再跑一次, 防止异步资源 (远程纹理 png 等) 改变高度 */
+        setTimeout(schedule, 200);
+      })();
+    </script>
+  </body>
+</html>
